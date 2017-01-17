@@ -75,7 +75,7 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Calculate the maximum Q-value of all actions for a given state
-        ''' see https://github.com/jmcol/machine-learning.git
+        ''' see https://discussions.udacity.com/t/how-to-calculate-reward-for-next-state-when-func-to-cal-reward-does-not-take-state-as-input/176353
             and https://discussions.udacity.com/t/in-which-function-do-i-update-the-q-table-and-how/204911
             and https://discussions.udacity.com/t/correct-q-value-calculation/174729 '''
 
