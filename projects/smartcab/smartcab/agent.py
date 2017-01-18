@@ -62,7 +62,7 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Set 'state' as a tuple of relevant data for the agent
-        state = (waypoint, inputs['light'], inputs['oncoming'], inputs['right'], inputs['left'], deadline)
+        state = (inputs, waypoint, deadline)
 
         return state
 
@@ -75,9 +75,9 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Calculate the maximum Q-value of all actions for a given state
-        ''' see https://discussions.udacity.com/t/how-to-calculate-reward-for-next-state-when-func-to-cal-reward-does-not-take-state-as-input/176353
-            and https://discussions.udacity.com/t/in-which-function-do-i-update-the-q-table-and-how/204911
-            and https://discussions.udacity.com/t/correct-q-value-calculation/174729 '''
+        x = self.Q[state]
+        maxQ = max(x.values())
+        return maxQ
 
 
     def createQ(self, state):
@@ -91,7 +91,9 @@ class LearningAgent(Agent):
         #   Then, for each action available, set the initial Q-value to 0.0
 
         if state not in self.Q:
-            self.Q[state] = 0.0
+            self.Q[state] = {}
+            for action in state[0]:
+                self.Q[state][action] = 0.0
 
         return
 
@@ -109,12 +111,16 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # When not learning, choose a random action
-
         if not self.learning:
             action = random.choice(self.valid_actions)
-
         # When learning, choose a random action with 'epsilon' probability
+        elif self.epsilon < random.random():
+            action = random.choice(self.valid_actions)
         #   Otherwise, choose an action with the highest Q-value for the current state
+        else:
+            actions = [k for k, v in self.Q[state].items() if v == self.get_maxQ(state)]
+            if len(actions) > 1:
+                action = random.choice(actions)
 
         return action
 
@@ -149,48 +155,3 @@ class LearningAgent(Agent):
         return
 
 
-def run():
-    """ Driving function for running the simulation.
-        Press ESC to close the simulation, or [SPACE] to pause the simulation. """
-
-    ##############
-    # Create the environment
-    # Flags:
-    #   verbose     - set to True to display additional output from the simulation
-    #   num_dummies - discrete number of dummy agents in the environment, default is 100
-    #   grid_size   - discrete number of intersections (columns, rows), default is (8, 6)
-    env = Environment()
-
-    ##############
-    # Create the driving agent
-    # Flags:
-    #   learning   - set to True to force the driving agent to use Q-learning
-    #    * epsilon - continuous value for the exploration factor, default is 1
-    #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent)
-
-    ##############
-    # Follow the driving agent
-    # Flags:
-    #   enforce_deadline - set to True to enforce a deadline metric
-    env.set_primary_agent(agent, enforce_deadline=True)
-
-    ##############
-    # Create the simulation
-    # Flags:
-    #   update_delay - continuous time (in seconds) between actions, default is 2.0 seconds
-    #   display      - set to False to disable the GUI if PyGame is enabled
-    #   log_metrics  - set to True to log trial and simulation results to /logs
-    #   optimized    - set to True to change the default log file name
-    sim = Simulator(env, update_delay=0.1, display=True, log_metrics=True)
-
-    ##############
-    # Run the simulator
-    # Flags:
-    #   tolerance  - epsilon tolerance before beginning testing, default is 0.05
-    #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=10)
-
-
-if __name__ == '__main__':
-    run()
