@@ -23,6 +23,7 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Set any additional class parameters as needed
+        self.total_trials = 1 #Total trials for decay function
 
 
     def reset(self, destination=None, testing=False):
@@ -37,10 +38,10 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Update epsilon using a decay function of your choice
-        self.epsilon = self.epsilon - 0.05
+        self.epsilon = 1/(self.total_trials**2)
 
         # Update additional class parameters as needed
-        ## ? ##
+        self.total_trials += 1
 
         # If 'testing' is True, set epsilon and alpha to 0
         if testing:
@@ -114,7 +115,7 @@ class LearningAgent(Agent):
         if not self.learning:
             action = random.choice(self.valid_actions)
         # When learning, choose a random action with 'epsilon' probability
-        elif self.epsilon < random.random():
+        elif self.epsilon > random.random():
             action = random.choice(self.valid_actions)
         #   Otherwise, choose an action with the highest Q-value for the current state
         else:
